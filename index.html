@@ -3,312 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CDNHBL - Gestión de Actividades</title>
+    <title>CDN Hub - Agenda de Actividades</title>
     
-    <!-- CDNHBL / CDN Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-primary: #141414;
-            --bg-card: #181818;
-            --text-primary: #ffffff;
-            --text-secondary: #aaaaaa;
-            --netflix-red: #E50914;
-            --netflix-red-hover: #b81d24;
-            --match-green: #46d369;
-            --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+            --bg-main: #0b0e14;
+            --bg-card: #161b22;
+            --accent: #7c4dff;
+            --accent-hover: #9575cd;
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
+            --success: #3fb950;
+            --glass: rgba(22, 27, 34, 0.8);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            overflow-x: hidden;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Navbar */
-        .top-navbar {
+        .header {
             position: fixed;
             top: 0;
             width: 100%;
-            height: 68px;
-            padding: 0 4%;
+            height: 70px;
+            padding: 0 5%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-            z-index: 100;
-            transition: background-color 0.4s var(--transition-smooth);
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
         }
 
-        .top-navbar.scrolled {
-            background-color: var(--bg-primary);
-        }
-
-        .nav-left, .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .btn-circle {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--text-primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .btn-circle:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.05);
-        }
-
-        .logo {
-            color: var(--netflix-red);
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             cursor: pointer;
         }
 
-        /* Perfiles */
-        .profiles-screen {
-            position: fixed;
-            inset: 0;
-            background-color: var(--bg-primary);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-        }
+        .nav-tools { display: flex; gap: 12px; }
 
-        .profiles-title { font-size: 2.5rem; margin-bottom: 2.5rem; }
-
-        .profiles-grid { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
-
-        .profile-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.8rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-        }
-
-        .profile-avatar-box {
-            width: 130px; height: 130px; border-radius: 8px; overflow: hidden;
-            border: 3px solid transparent; transition: 0.2s; position: relative;
-        }
-
-        .profile-card:hover .profile-avatar-box { border-color: #fff; transform: scale(1.06); }
-        .profile-card:hover { color: #fff; }
-        .profile-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .badge-type {
-            position: absolute; bottom: 0; width: 100%;
-            background: rgba(0,0,0,0.7); color: #fff; font-size: 0.7rem;
-            text-align: center; padding: 4px 0; font-weight: 700;
-        }
-
-        /* Cards & Grid */
-        .day-section { margin-bottom: 45px; animation: fadeIn 0.6s ease forwards; }
-        .day-title {
-            font-size: 1.4rem; font-weight: 700; margin-bottom: 18px;
-            color: #e5e5e5; border-left: 4px solid var(--netflix-red); padding-left: 15px;
-        }
-
-        .day-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        .activity-card {
-            background: var(--bg-card);
-            border-radius: 6px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.3s var(--transition-smooth);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .activity-card:hover { transform: scale(1.04); z-index: 10; }
-
-        .card-img-container {
-            width: 100%;
-            height: 140px;
-            position: relative;
-            background: #222;
-        }
-
-        .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
-
-        .btn-edit-card {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--netflix-red);
+        .icon-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: none; /* Se activa con JS */
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
-            font-size: 0.8rem;
-            z-index: 5;
         }
 
-        /* Modales */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+        .icon-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .welcome-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome-title { font-size: 2.5rem; margin-bottom: 40px; font-weight: 800; }
+
+        .mode-grid {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 280px;
+        }
+
+        .mode-card:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .mode-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .main-container { padding: 100px 5% 50px; }
+
+        .day-group { margin-bottom: 60px; }
+        .day-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .day-label::after { content: ""; height: 1px; flex: 1; background: rgba(255,255,255,0.1); }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .event-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .event-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-5px); }
+
+        .event-img { width: 100%; height: 180px; object-fit: cover; }
+
+        .event-body { padding: 20px; }
+
+        .event-time { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+        .event-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+        .event-meta { font-size: 0.85rem; color: var(--text-dim); }
+
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             display: none; justify-content: center; align-items: center;
-            z-index: 1000; backdrop-filter: blur(8px);
+            z-index: 2000; padding: 20px; backdrop-filter: blur(10px);
         }
 
-        .modal-content-card {
-            background: var(--bg-card); width: 90%; max-width: 700px;
-            border-radius: 12px; overflow: hidden; position: relative;
-            max-height: 90vh; overflow-y: auto;
+        .modal-box {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 650px;
+            border-radius: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .btn-close-modal {
-            position: absolute; top: 15px; right: 15px;
-            background: rgba(0,0,0,0.5); color: #fff; border: none;
-            width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 11;
-        }
-
-        .admin-form { display: flex; flex-direction: column; gap: 15px; padding: 25px; }
+        .admin-form { padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .admin-form input, .admin-form textarea, .admin-form select {
-            background: #333; border: 1px solid #444; color: #fff;
-            padding: 12px; border-radius: 4px; font-family: inherit;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
         }
 
-        .btn-save {
-            background: var(--netflix-red); color: #fff; border: none;
-            padding: 14px; font-weight: 700; cursor: pointer; border-radius: 4px;
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .logged-in-admin #btnAdmin, .logged-in-admin .btn-edit-card { display: flex !important; }
+        .btn-primary:hover { background: var(--accent-hover); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        .admin-only { display: none; }
+        .logged-in-admin .admin-only { display: flex !important; }
 
         @media (max-width: 600px) {
-            .day-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-            .profiles-title { font-size: 1.6rem; }
+            .welcome-title { font-size: 1.8rem; }
+            .mode-card { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Nav -->
-    <nav class="top-navbar" id="topNavbar">
-        <div class="nav-left">
-            <button class="btn-circle" id="btnBack" onclick="volverAPerfiles()" style="display: none;">
-                <i class="fa-solid fa-arrow-left"></i>
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="icon-btn" id="btnBack" onclick="volver()" style="display: none;">
+                <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <div class="logo" onclick="location.reload()">CDNHBL</div>
+            <div class="brand" onclick="location.reload()">CDN HUB</div>
         </div>
-        <div class="nav-right">
-            <button class="btn-circle" id="btnLogin" onclick="abrirLogin()" title="Acceso Admin">
-                <i class="fa-solid fa-lock"></i>
-            </button>
-            <button class="btn-circle" id="btnAdmin" onclick="abrirAdminModal()" style="display: none;" title="Nueva Actividad">
-                <i class="fa-solid fa-plus"></i>
-            </button>
+        <div class="nav-tools">
+            <button class="icon-btn" onclick="abrirLogin()"><i class="fa-solid fa-shield-halved"></i></button>
+            <button class="icon-btn admin-only" onclick="abrirAdminModal()"><i class="fa-solid fa-plus"></i></button>
         </div>
-    </nav>
+    </header>
 
-    <!-- Pantalla de Perfiles -->
-    <div id="profilesScreen" class="profiles-screen">
-        <h1 class="profiles-title">¿Quién está viendo hoy?</h1>
-        <div class="profiles-grid">
-            <div class="profile-card" onclick="seleccionarPerfil('presencial')">
-                <div class="profile-avatar-box">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" alt="Presencial">
-                    <div class="badge-type">Presencial</div>
-                </div>
-                <span class="profile-label">Perfil 1</span>
+    <section id="welcomeScreen" class="welcome-screen">
+        <h1 class="welcome-title">Bienvenido a la Agenda CDN</h1>
+        <div class="mode-grid">
+            <div class="mode-card" onclick="seleccionarModalidad('presencial')">
+                <div class="mode-icon"><i class="fa-solid fa-building-user"></i></div>
+                <h2>Presencial</h2>
+                <p style="color: var(--text-dim); margin-top:10px;">Actividades en sede física</p>
             </div>
-            <div class="profile-card" onclick="seleccionarPerfil('online')">
-                <div class="profile-avatar-box">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" alt="Online">
-                    <div class="badge-type">Online</div>
-                </div>
-                <span class="profile-label">Perfil 2</span>
+            <div class="mode-card" onclick="seleccionarModalidad('online')">
+                <div class="mode-icon"><i class="fa-solid fa-globe"></i></div>
+                <h2>Online</h2>
+                <p style="color: var(--text-dim); margin-top:10px;">Transmisiones y webinars</p>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Contenido Principal -->
-    <main id="mainContent" style="display: none; padding: 100px 4% 50px 4%;">
-        <h2 id="sectionTitle" style="font-size: 2rem; margin-bottom: 30px;"></h2>
+    <main id="mainContent" class="main-container" style="display: none;">
+        <h2 id="sectionTitle" style="margin-bottom: 40px; font-size: 2rem;"></h2>
         <div id="daysContainer"></div>
     </main>
 
-    <!-- Modal Detalle Actividad -->
-    <div id="detailModal" class="modal-overlay" onclick="cerrarSiFuera(event, 'detailModal')">
-        <div class="modal-content-card">
-            <button class="btn-close-modal" onclick="cerrarModal('detailModal')"><i class="fa-solid fa-xmark"></i></button>
-            <div id="detailMedia" style="width:100%; height:350px; background:#000;"></div>
-            <div style="padding:30px;">
-                <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px;">
-                    <span id="detailMatch" style="color:var(--match-green); font-weight:bold;"></span>
-                    <span id="detailDay" style="color:var(--text-secondary); border:1px solid; padding:2px 8px;"></span>
-                </div>
-                <h2 id="detailTitle" style="font-size:2rem; margin-bottom:15px;"></h2>
-                <p id="detailDesc" style="color:var(--text-secondary); line-height:1.6; font-size:1.1rem;"></p>
+    <div id="detailModal" class="modal" onclick="cerrarSiFuera(event, 'detailModal')">
+        <div class="modal-box">
+            <div id="detailMedia"></div>
+            <div style="padding: 30px;">
+                <div id="detailTime" class="event-time"></div>
+                <h2 id="detailTitle" style="font-size: 1.8rem; margin-bottom: 10px;"></h2>
+                <p id="detailResponsable" style="color: var(--accent); margin-bottom: 20px; font-weight: 600;"></p>
+                <p id="detailDesc" style="color: var(--text-dim); line-height: 1.7;"></p>
+                <div id="detailLinkArea"></div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Login -->
-    <div id="loginModal" class="modal-overlay" onclick="cerrarSiFuera(event, 'loginModal')">
-        <div class="modal-content-card" style="max-width:350px;">
+    <div id="loginModal" class="modal" onclick="cerrarSiFuera(event, 'loginModal')">
+        <div class="modal-box" style="max-width: 400px;">
             <div class="admin-form">
-                <h2 style="text-align:center;">Acceso Admin</h2>
+                <h2 style="text-align: center;">Acceso Staff</h2>
                 <input type="text" id="userLogin" placeholder="Usuario">
                 <input type="password" id="passLogin" placeholder="Contraseña">
-                <button class="btn-save" onclick="intentarLogin()">ENTRAR</button>
+                <button class="btn-primary" onclick="intentarLogin()">ENTRAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Admin (Crear/Editar) -->
-    <div id="adminModal" class="modal-overlay" onclick="cerrarSiFuera(event, 'adminModal')">
-        <div class="modal-content-card">
-            <button class="btn-close-modal" onclick="cerrarModal('adminModal')"><i class="fa-solid fa-xmark"></i></button>
+    <div id="adminModal" class="modal" onclick="cerrarSiFuera(event, 'adminModal')">
+        <div class="modal-box">
             <form id="formActividad" class="admin-form">
-                <h2 id="adminFormTitle">Nueva Actividad</h2>
+                <h2 id="adminFormTitle">Gestionar Actividad</h2>
                 <input type="hidden" id="editId">
-                <input type="text" id="fTitulo" placeholder="Título de la actividad" required>
-                <textarea id="fDesc" placeholder="Descripción corta" rows="3" required></textarea>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="text" id="fTitulo" placeholder="Nombre de la actividad" required>
+                <input type="text" id="fResponsable" placeholder="Persona responsable" required>
+                <textarea id="fDesc" placeholder="Descripción detallada" rows="4" required></textarea>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <select id="fDia" required>
                         <option value="LUNES">LUNES</option>
                         <option value="MARTES">MARTES</option>
@@ -318,99 +303,74 @@
                         <option value="SÁBADO">SÁBADO</option>
                         <option value="DOMINGO">DOMINGO</option>
                     </select>
-                    <input type="text" id="fHora" placeholder="Hora (ej. 10:00 AM)">
+                    <input type="text" id="fHora" placeholder="Hora (ej. 15:00)">
                 </div>
-                <input type="url" id="fImg" placeholder="URL de Imagen (Opcional)">
-                <button type="submit" class="btn-save" id="btnSubmitForm">GUARDAR ACTIVIDAD</button>
-                <button type="button" id="btnDelete" class="btn-save" style="background:#444; margin-top:-5px; display:none;" onclick="eliminarActividad()">ELIMINAR ACTIVIDAD</button>
+                <input type="url" id="fLink" placeholder="Link (Zoom, YouTube, etc.)">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 5px;">Imagen de portada:</label>
+                    <input type="file" id="fImgFile" accept="image/*">
+                    <input type="hidden" id="fImgData">
+                </div>
+                <button type="submit" class="btn-primary">GUARDAR CAMBIOS</button>
+                <button type="button" id="btnDelete" class="btn-primary" style="background: #333;" onclick="eliminarActividad()">ELIMINAR</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Configuración y Datos
         const DIAS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
-        const PLACEHOLDER = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
-        const ADMIN_CREDENTIALS = { user: 'admin', pass: 'cdn12345' };
+        const DEFAULT_IMG = "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800&q=80";
         
-        let actividades = JSON.parse(localStorage.getItem('cdnhbl_db')) || [
-            { id: 1, titulo: 'Sesión de Bienvenida', desc: 'Introducción oficial a la jornada semanal.', dia: 'LUNES', hora: '09:00', tipo: 'presencial', img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80', match: '98%' }
-        ];
-
-        let perfilActual = null;
+        let actividades = JSON.parse(localStorage.getItem('cdn_hub_db')) || [];
+        let modalidadActual = null;
         let isAdmin = false;
 
-        // --- AUTENTICACIÓN ---
-        function abrirLogin() { 
-            if(isAdmin) {
-                if(confirm("¿Cerrar sesión de administrador?")) {
-                    isAdmin = false;
-                    document.body.classList.remove('logged-in-admin');
-                    document.getElementById('btnLogin').innerHTML = '<i class="fa-solid fa-lock"></i>';
-                }
-            } else {
-                document.getElementById('loginModal').style.display = 'flex'; 
+        document.getElementById('fImgFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => document.getElementById('fImgData').value = e.target.result;
+                reader.readAsDataURL(file);
             }
-        }
+        });
 
-        function intentarLogin() {
-            const u = document.getElementById('userLogin').value;
-            const p = document.getElementById('passLogin').value;
-            if(u === ADMIN_CREDENTIALS.user && p === ADMIN_CREDENTIALS.pass) {
-                isAdmin = true;
-                document.body.classList.add('logged-in-admin');
-                document.getElementById('btnLogin').innerHTML = '<i class="fa-solid fa-lock-open"></i>';
-                cerrarModal('loginModal');
-                renderizar();
-            } else {
-                alert("Credenciales incorrectas");
-            }
-        }
-
-        // --- NAVEGACIÓN ---
-        function seleccionarPerfil(tipo) {
-            perfilActual = tipo;
-            document.getElementById('profilesScreen').style.display = 'none';
+        function seleccionarModalidad(m) {
+            modalidadActual = m;
+            document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('btnBack').style.display = 'flex';
-            document.getElementById('sectionTitle').innerText = tipo === 'presencial' ? 'Actividades Presenciales' : 'Actividades Online';
+            document.getElementById('sectionTitle').innerText = m === 'presencial' ? 'Agenda Presencial' : 'Agenda Online';
             renderizar();
         }
 
-        function volverAPerfiles() {
-            document.getElementById('profilesScreen').style.display = 'flex';
+        function volver() {
+            document.getElementById('welcomeScreen').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'none';
             document.getElementById('btnBack').style.display = 'none';
         }
 
-        // --- RENDERIZADO ---
         function renderizar() {
             const container = document.getElementById('daysContainer');
             container.innerHTML = "";
-
             DIAS.forEach(dia => {
-                const filtradas = actividades.filter(a => a.dia === dia && a.tipo === perfilActual);
-                
-                if(filtradas.length > 0 || isAdmin) {
+                const filtradas = actividades.filter(a => a.dia === dia && a.tipo === modalidadActual);
+                if (filtradas.length > 0 || isAdmin) {
                     const section = document.createElement('div');
-                    section.className = 'day-section';
-                    section.innerHTML = `<h3 class="day-title">${dia}</h3><div class="day-grid" id="grid-${dia}"></div>`;
+                    section.className = 'day-group';
+                    section.innerHTML = `<div class="day-label">${dia}</div><div class="event-grid" id="grid-${dia}"></div>`;
                     container.appendChild(section);
-
                     const grid = document.getElementById(`grid-${dia}`);
                     filtradas.forEach(act => {
                         const card = document.createElement('div');
-                        card.className = 'activity-card';
+                        card.className = 'event-card';
                         card.innerHTML = `
-                            <button class="btn-edit-card" onclick="event.stopPropagation(); abrirEditar(${act.id})"><i class="fa-solid fa-pencil"></i></button>
-                            <div class="card-img-container" onclick="abrirDetalle(${act.id})">
-                                <img src="${act.img || PLACEHOLDER}">
-                            </div>
-                            <div style="padding:12px;" onclick="abrirDetalle(${act.id})">
-                                <h4 style="font-size:0.9rem; margin-bottom:5px;">${act.titulo}</h4>
-                                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--match-green);">
-                                    <span>${act.match || '95%'} Match</span>
-                                    <span style="color:var(--text-secondary)">${act.hora || ''}</span>
+                            <img src="${act.img || DEFAULT_IMG}" class="event-img" onclick="abrirDetalle(${act.id})">
+                            <div class="event-body">
+                                <div class="event-time">${act.hora || 'Hora a definir'}</div>
+                                <h3 class="event-title">${act.titulo}</h3>
+                                <p class="event-meta">Por: ${act.responsable}</p>
+                                <div class="admin-only" style="margin-top:15px;">
+                                    <button class="icon-btn" onclick="abrirEditar(${act.id})"><i class="fa-solid fa-pen"></i></button>
                                 </div>
                             </div>
                         `;
@@ -420,95 +380,96 @@
             });
         }
 
-        // --- CRUD ACTIVIDADES ---
         function abrirAdminModal() {
             document.getElementById('formActividad').reset();
             document.getElementById('editId').value = "";
-            document.getElementById('adminFormTitle').innerText = "Nueva Actividad";
-            document.getElementById('btnDelete').style.display = "none";
+            document.getElementById('fImgData').value = "";
             document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('btnDelete').style.display = 'none';
         }
 
         function abrirEditar(id) {
             const act = actividades.find(a => a.id === id);
-            if(!act) return;
             document.getElementById('editId').value = act.id;
             document.getElementById('fTitulo').value = act.titulo;
+            document.getElementById('fResponsable').value = act.responsable;
             document.getElementById('fDesc').value = act.desc;
             document.getElementById('fDia').value = act.dia;
             document.getElementById('fHora').value = act.hora;
-            document.getElementById('fImg').value = act.img === PLACEHOLDER ? "" : act.img;
-            
-            document.getElementById('adminFormTitle').innerText = "Editar Actividad";
-            document.getElementById('btnDelete').style.display = "block";
+            document.getElementById('fLink').value = act.link || "";
+            document.getElementById('fImgData').value = act.img || "";
             document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('btnDelete').style.display = 'block';
         }
 
         document.getElementById('formActividad').onsubmit = function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const nuevaAct = {
+            const data = {
                 id: id ? parseInt(id) : Date.now(),
                 titulo: document.getElementById('fTitulo').value,
+                responsable: document.getElementById('fResponsable').value,
                 desc: document.getElementById('fDesc').value,
                 dia: document.getElementById('fDia').value,
                 hora: document.getElementById('fHora').value,
-                img: document.getElementById('fImg').value || PLACEHOLDER,
-                tipo: perfilActual,
-                match: (Math.floor(Math.random() * 20) + 80) + "%"
+                link: document.getElementById('fLink').value,
+                img: document.getElementById('fImgData').value || DEFAULT_IMG,
+                tipo: modalidadActual
             };
-
             if(id) {
-                const index = actividades.findIndex(a => a.id === parseInt(id));
-                actividades[index] = nuevaAct;
+                const idx = actividades.findIndex(a => a.id === parseInt(id));
+                actividades[idx] = data;
             } else {
-                actividades.push(nuevaAct);
+                actividades.push(data);
             }
-
-            guardarYRefrescar();
+            localStorage.setItem('cdn_hub_db', JSON.stringify(actividades));
+            renderizar();
             cerrarModal('adminModal');
         };
 
         function eliminarActividad() {
-            const id = parseInt(document.getElementById('editId').value);
-            if(confirm("¿Eliminar esta actividad definitivamente?")) {
+            if(confirm("¿Eliminar actividad?")) {
+                const id = parseInt(document.getElementById('editId').value);
                 actividades = actividades.filter(a => a.id !== id);
-                guardarYRefrescar();
+                localStorage.setItem('cdn_hub_db', JSON.stringify(actividades));
+                renderizar();
                 cerrarModal('adminModal');
             }
         }
 
-        function guardarYRefrescar() {
-            localStorage.setItem('cdnhbl_db', JSON.stringify(actividades));
-            renderizar();
-        }
-
-        // --- DETALLE ---
         function abrirDetalle(id) {
             const act = actividades.find(a => a.id === id);
-            document.getElementById('detailMedia').innerHTML = `<img src="${act.img || PLACEHOLDER}" style="width:100%; height:100%; object-fit:cover;">`;
+            document.getElementById('detailMedia').innerHTML = `<img src="${act.img || DEFAULT_IMG}" style="width:100%; height:250px; object-fit:cover;">`;
             document.getElementById('detailTitle').innerText = act.titulo;
+            document.getElementById('detailTime').innerText = act.dia + " | " + act.hora;
+            document.getElementById('detailResponsable').innerText = "Facilitador: " + act.responsable;
             document.getElementById('detailDesc').innerText = act.desc;
-            document.getElementById('detailMatch').innerText = act.match;
-            document.getElementById('detailDay').innerText = act.dia + (act.hora ? ` | ${act.hora}` : "");
+            const areaLink = document.getElementById('detailLinkArea');
+            areaLink.innerHTML = act.link ? `<a href="${act.link}" target="_blank" class="btn-link"><i class="fa-solid fa-up-right-from-square"></i> ACCEDER</a>` : "";
             document.getElementById('detailModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
         }
 
-        // --- UTILIDADES ---
-        function cerrarModal(id) {
-            document.getElementById(id).style.display = 'none';
-            document.body.style.overflow = 'auto';
+        function abrirLogin() {
+            if(isAdmin) {
+                isAdmin = false;
+                document.body.classList.remove('logged-in-admin');
+                renderizar();
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+            }
         }
 
-        function cerrarSiFuera(e, id) {
-            if(e.target.id === id) cerrarModal(id);
+        function intentarLogin() {
+            if(document.getElementById('userLogin').value === 'admin' && document.getElementById('passLogin').value === 'cdn123') {
+                isAdmin = true;
+                document.body.classList.add('logged-in-admin');
+                cerrarModal('loginModal');
+                renderizar();
+            } else { alert("Error"); }
         }
 
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('topNavbar');
-            window.scrollY > 50 ? nav.classList.add('scrolled') : nav.classList.remove('scrolled');
-        });
+        function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
+        function cerrarSiFuera(e, id) { if(e.target.id === id) cerrarModal(id); }
     </script>
 </body>
 </html>
