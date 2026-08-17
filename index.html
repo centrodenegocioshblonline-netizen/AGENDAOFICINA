@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CDNHBL - Gestión de Actividades</title>
+    
+    <!-- CDNHBL / CDN Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #141414;
+            --bg-card: #181818;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --netflix-red: #E50914;
+            --netflix-red-hover: #b81d24;
+            --match-green: #46d369;
+            --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 68px;
+            padding: 0 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            z-index: 100;
+            transition: background-color 0.4s var(--transition-smooth);
+        }
+
+        .top-navbar.scrolled {
+            background-color: var(--bg-primary);
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-circle {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-circle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .logo {
+            color: var(--netflix-red);
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        /* Perfiles */
+        .profiles-screen {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .profiles-title { font-size: 2.5rem; margin-bottom: 2.5rem; }
+
+        .profiles-grid { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
+
+        .profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .profile-avatar-box {
+            width: 130px; height: 130px; border-radius: 8px; overflow: hidden;
+            border: 3px solid transparent; transition: 0.2s; position: relative;
+        }
+
+        .profile-card:hover .profile-avatar-box { border-color: #fff; transform: scale(1.06); }
+        .profile-card:hover { color: #fff; }
+        .profile-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .badge-type {
+            position: absolute; bottom: 0; width: 100%;
+            background: rgba(0,0,0,0.7); color: #fff; font-size: 0.7rem;
+            text-align: center; padding: 4px 0; font-weight: 700;
+        }
+
+        /* Cards & Grid */
+        .day-section { margin-bottom: 45px; animation: fadeIn 0.6s ease forwards; }
+        .day-title {
+            font-size: 1.4rem; font-weight: 700; margin-bottom: 18px;
+            color: #e5e5e5; border-left: 4px solid var(--netflix-red); padding-left: 15px;
+        }
+
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .activity-card {
+            background: var(--bg-card);
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s var(--transition-smooth);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .activity-card:hover { transform: scale(1.04); z-index: 10; }
+
+        .card-img-container {
+            width: 100%;
+            height: 140px;
+            position: relative;
+            background: #222;
+        }
+
+        .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-edit-card {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--netflix-red);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: none; /* Se activa con JS */
+            align-items: center;
+            justify-content: center;
+            border: none;
+            font-size: 0.8rem;
+            z-index: 5;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(8px);
+        }
+
+        .modal-content-card {
+            background: var(--bg-card); width: 90%; max-width: 700px;
+            border-radius: 12px; overflow: hidden; position: relative;
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        .btn-close-modal {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(0,0,0,0.5); color: #fff; border: none;
+            width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 11;
+        }
+
+        .admin-form { display: flex; flex-direction: column; gap: 15px; padding: 25px; }
+        .admin-form input, .admin-form textarea, .admin-form select {
+            background: #333; border: 1px solid #444; color: #fff;
+            padding: 12px; border-radius: 4px; font-family: inherit;
+        }
+
+        .btn-save {
+            background: var(--netflix-red); color: #fff; border: none;
+            padding: 14px; font-weight: 700; cursor: pointer; border-radius: 4px;
+        }
+
+        .logged-in-admin #btnAdmin, .logged-in-admin .btn-edit-card { display: flex !important; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .day-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .profiles-title { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Nav -->
+    <nav class="top-navbar" id="topNavbar">
+        <div class="nav-left">
+            <button class="btn-circle" id="btnBack" onclick="volverAPerfiles()" style="display: none;">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="logo" onclick="location.reload()">CDNHBL</div>
+        </div>
+        <div class="nav-right">
+            <button class="btn-circle" id="btnLogin" onclick="abrirLogin()" title="Acceso Admin">
+                <i class="fa-solid fa-lock"></i>
+            </button>
+            <button class="btn-circle" id="btnAdmin" onclick="abrirAdminModal()" style="display: none;" title="Nueva Actividad">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Pantalla de Perfiles -->
+    <div id="profilesScreen" class="profiles-screen">
+        <h1 class="profiles-title">¿Quién está viendo hoy?</h1>
+        <div class="profiles-grid">
+            <div class="profile-card" onclick="seleccionarPerfil('presencial')">
+                <div class="profile-avatar-box">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" alt="Presencial">
+                    <div class="badge-type">Presencial</div>
+                </div>
+                <span class="profile-label">Perfil 1</span>
+            </div>
+            <div class="profile-card" onclick="seleccionarPerfil('online')">
+                <div class="profile-avatar-box">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" alt="Online">
+                    <div class="badge-type">Online</div>
+                </div>
+                <span class="profile-label">Perfil 2</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <main id="mainContent" style="display: none; padding: 100px 4% 50px 4%;">
+        <h2 id="sectionTitle" style="font-size: 2rem; margin-bottom: 30px;"></h2>
+        <div id="daysContainer"></div>
+    </main>
+
+    <!-- Modal Detalle Actividad -->
+    <div id="detailModal" class="modal-overlay" onclick="cerrarSiFuera(event, 'detailModal')">
+        <div class="modal-content-card">
+            <button class="btn-close-modal" onclick="cerrarModal('detailModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div id="detailMedia" style="width:100%; height:350px; background:#000;"></div>
+            <div style="padding:30px;">
+                <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px;">
+                    <span id="detailMatch" style="color:var(--match-green); font-weight:bold;"></span>
+                    <span id="detailDay" style="color:var(--text-secondary); border:1px solid; padding:2px 8px;"></span>
+                </div>
+                <h2 id="detailTitle" style="font-size:2rem; margin-bottom:15px;"></h2>
+                <p id="detailDesc" style="color:var(--text-secondary); line-height:1.6; font-size:1.1rem;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Login -->
+    <div id="loginModal" class="modal-overlay" onclick="cerrarSiFuera(event, 'loginModal')">
+        <div class="modal-content-card" style="max-width:350px;">
+            <div class="admin-form">
+                <h2 style="text-align:center;">Acceso Admin</h2>
+                <input type="text" id="userLogin" placeholder="Usuario">
+                <input type="password" id="passLogin" placeholder="Contraseña">
+                <button class="btn-save" onclick="intentarLogin()">ENTRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Admin (Crear/Editar) -->
+    <div id="adminModal" class="modal-overlay" onclick="cerrarSiFuera(event, 'adminModal')">
+        <div class="modal-content-card">
+            <button class="btn-close-modal" onclick="cerrarModal('adminModal')"><i class="fa-solid fa-xmark"></i></button>
+            <form id="formActividad" class="admin-form">
+                <h2 id="adminFormTitle">Nueva Actividad</h2>
+                <input type="hidden" id="editId">
+                <input type="text" id="fTitulo" placeholder="Título de la actividad" required>
+                <textarea id="fDesc" placeholder="Descripción corta" rows="3" required></textarea>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <select id="fDia" required>
+                        <option value="LUNES">LUNES</option>
+                        <option value="MARTES">MARTES</option>
+                        <option value="MIÉRCOLES">MIÉRCOLES</option>
+                        <option value="JUEVES">JUEVES</option>
+                        <option value="VIERNES">VIERNES</option>
+                        <option value="SÁBADO">SÁBADO</option>
+                        <option value="DOMINGO">DOMINGO</option>
+                    </select>
+                    <input type="text" id="fHora" placeholder="Hora (ej. 10:00 AM)">
+                </div>
+                <input type="url" id="fImg" placeholder="URL de Imagen (Opcional)">
+                <button type="submit" class="btn-save" id="btnSubmitForm">GUARDAR ACTIVIDAD</button>
+                <button type="button" id="btnDelete" class="btn-save" style="background:#444; margin-top:-5px; display:none;" onclick="eliminarActividad()">ELIMINAR ACTIVIDAD</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuración y Datos
+        const DIAS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
+        const PLACEHOLDER = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
+        const ADMIN_CREDENTIALS = { user: 'admin', pass: 'cdn12345' };
+        
+        let actividades = JSON.parse(localStorage.getItem('cdnhbl_db')) || [
+            { id: 1, titulo: 'Sesión de Bienvenida', desc: 'Introducción oficial a la jornada semanal.', dia: 'LUNES', hora: '09:00', tipo: 'presencial', img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80', match: '98%' }
+        ];
+
+        let perfilActual = null;
+        let isAdmin = false;
+
+        // --- AUTENTICACIÓN ---
+        function abrirLogin() { 
+            if(isAdmin) {
+                if(confirm("¿Cerrar sesión de administrador?")) {
+                    isAdmin = false;
+                    document.body.classList.remove('logged-in-admin');
+                    document.getElementById('btnLogin').innerHTML = '<i class="fa-solid fa-lock"></i>';
+                }
+            } else {
+                document.getElementById('loginModal').style.display = 'flex'; 
+            }
+        }
+
+        function intentarLogin() {
+            const u = document.getElementById('userLogin').value;
+            const p = document.getElementById('passLogin').value;
+            if(u === ADMIN_CREDENTIALS.user && p === ADMIN_CREDENTIALS.pass) {
+                isAdmin = true;
+                document.body.classList.add('logged-in-admin');
+                document.getElementById('btnLogin').innerHTML = '<i class="fa-solid fa-lock-open"></i>';
+                cerrarModal('loginModal');
+                renderizar();
+            } else {
+                alert("Credenciales incorrectas");
+            }
+        }
+
+        // --- NAVEGACIÓN ---
+        function seleccionarPerfil(tipo) {
+            perfilActual = tipo;
+            document.getElementById('profilesScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('btnBack').style.display = 'flex';
+            document.getElementById('sectionTitle').innerText = tipo === 'presencial' ? 'Actividades Presenciales' : 'Actividades Online';
+            renderizar();
+        }
+
+        function volverAPerfiles() {
+            document.getElementById('profilesScreen').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('btnBack').style.display = 'none';
+        }
+
+        // --- RENDERIZADO ---
+        function renderizar() {
+            const container = document.getElementById('daysContainer');
+            container.innerHTML = "";
+
+            DIAS.forEach(dia => {
+                const filtradas = actividades.filter(a => a.dia === dia && a.tipo === perfilActual);
+                
+                if(filtradas.length > 0 || isAdmin) {
+                    const section = document.createElement('div');
+                    section.className = 'day-section';
+                    section.innerHTML = `<h3 class="day-title">${dia}</h3><div class="day-grid" id="grid-${dia}"></div>`;
+                    container.appendChild(section);
+
+                    const grid = document.getElementById(`grid-${dia}`);
+                    filtradas.forEach(act => {
+                        const card = document.createElement('div');
+                        card.className = 'activity-card';
+                        card.innerHTML = `
+                            <button class="btn-edit-card" onclick="event.stopPropagation(); abrirEditar(${act.id})"><i class="fa-solid fa-pencil"></i></button>
+                            <div class="card-img-container" onclick="abrirDetalle(${act.id})">
+                                <img src="${act.img || PLACEHOLDER}">
+                            </div>
+                            <div style="padding:12px;" onclick="abrirDetalle(${act.id})">
+                                <h4 style="font-size:0.9rem; margin-bottom:5px;">${act.titulo}</h4>
+                                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--match-green);">
+                                    <span>${act.match || '95%'} Match</span>
+                                    <span style="color:var(--text-secondary)">${act.hora || ''}</span>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+            });
+        }
+
+        // --- CRUD ACTIVIDADES ---
+        function abrirAdminModal() {
+            document.getElementById('formActividad').reset();
+            document.getElementById('editId').value = "";
+            document.getElementById('adminFormTitle').innerText = "Nueva Actividad";
+            document.getElementById('btnDelete').style.display = "none";
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function abrirEditar(id) {
+            const act = actividades.find(a => a.id === id);
+            if(!act) return;
+            document.getElementById('editId').value = act.id;
+            document.getElementById('fTitulo').value = act.titulo;
+            document.getElementById('fDesc').value = act.desc;
+            document.getElementById('fDia').value = act.dia;
+            document.getElementById('fHora').value = act.hora;
+            document.getElementById('fImg').value = act.img === PLACEHOLDER ? "" : act.img;
+            
+            document.getElementById('adminFormTitle').innerText = "Editar Actividad";
+            document.getElementById('btnDelete').style.display = "block";
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        document.getElementById('formActividad').onsubmit = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const nuevaAct = {
+                id: id ? parseInt(id) : Date.now(),
+                titulo: document.getElementById('fTitulo').value,
+                desc: document.getElementById('fDesc').value,
+                dia: document.getElementById('fDia').value,
+                hora: document.getElementById('fHora').value,
+                img: document.getElementById('fImg').value || PLACEHOLDER,
+                tipo: perfilActual,
+                match: (Math.floor(Math.random() * 20) + 80) + "%"
+            };
+
+            if(id) {
+                const index = actividades.findIndex(a => a.id === parseInt(id));
+                actividades[index] = nuevaAct;
+            } else {
+                actividades.push(nuevaAct);
+            }
+
+            guardarYRefrescar();
+            cerrarModal('adminModal');
+        };
+
+        function eliminarActividad() {
+            const id = parseInt(document.getElementById('editId').value);
+            if(confirm("¿Eliminar esta actividad definitivamente?")) {
+                actividades = actividades.filter(a => a.id !== id);
+                guardarYRefrescar();
+                cerrarModal('adminModal');
+            }
+        }
+
+        function guardarYRefrescar() {
+            localStorage.setItem('cdnhbl_db', JSON.stringify(actividades));
+            renderizar();
+        }
+
+        // --- DETALLE ---
+        function abrirDetalle(id) {
+            const act = actividades.find(a => a.id === id);
+            document.getElementById('detailMedia').innerHTML = `<img src="${act.img || PLACEHOLDER}" style="width:100%; height:100%; object-fit:cover;">`;
+            document.getElementById('detailTitle').innerText = act.titulo;
+            document.getElementById('detailDesc').innerText = act.desc;
+            document.getElementById('detailMatch').innerText = act.match;
+            document.getElementById('detailDay').innerText = act.dia + (act.hora ? ` | ${act.hora}` : "");
+            document.getElementById('detailModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // --- UTILIDADES ---
+        function cerrarModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function cerrarSiFuera(e, id) {
+            if(e.target.id === id) cerrarModal(id);
+        }
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('topNavbar');
+            window.scrollY > 50 ? nav.classList.add('scrolled') : nav.classList.remove('scrolled');
+        });
+    </script>
+</body>
+</html>
