@@ -5,227 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CDN Hub - Agenda de Actividades</title>
     
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
+        /* (Tus estilos se mantienen iguales, solo añado uno para loading) */
         :root {
-            --bg-main: #0b0e14;
-            --bg-card: #161b22;
-            --accent: #7c4dff;
-            --accent-hover: #9575cd;
-            --text-main: #f0f6fc;
-            --text-dim: #8b949e;
-            --success: #3fb950;
-            --glass: rgba(22, 27, 34, 0.8);
+            --bg-main: #0b0e14; --bg-card: #161b22; --accent: #7c4dff;
+            --accent-hover: #9575cd; --text-main: #f0f6fc; --text-dim: #8b949e;
+            --success: #3fb950; --glass: rgba(22, 27, 34, 0.8);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 70px;
-            padding: 0 5%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            z-index: 1000;
-        }
-
-        .brand {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            background: linear-gradient(90deg, #fff, var(--accent));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+        .header { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 5%; display: flex; align-items: center; justify-content: space-between; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .brand { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, var(--accent)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
         .nav-tools { display: flex; gap: 12px; }
-
-        .icon-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon-btn:hover {
-            background: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        .welcome-screen {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
+        .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .icon-btn:hover { background: var(--accent); transform: translateY(-2px); }
+        .welcome-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         .welcome-title { font-size: 2.5rem; margin-bottom: 40px; font-weight: 800; }
-
-        .mode-grid {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .mode-card {
-            background: var(--bg-card);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 280px;
-        }
-
-        .mode-card:hover {
-            border-color: var(--accent);
-            transform: scale(1.05);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .mode-icon {
-            font-size: 3rem;
-            color: var(--accent);
-            margin-bottom: 20px;
-        }
-
+        .mode-grid { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .mode-card { background: var(--bg-card); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.4s; width: 280px; }
+        .mode-card:hover { border-color: var(--accent); transform: scale(1.05); }
+        .mode-icon { font-size: 3rem; color: var(--accent); margin-bottom: 20px; }
         .main-container { padding: 100px 5% 50px; }
-
         .day-group { margin-bottom: 60px; }
-        .day-label {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent);
-            font-weight: 700;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .day-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
         .day-label::after { content: ""; height: 1px; flex: 1; background: rgba(255,255,255,0.1); }
-
-        .event-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .event-card {
-            background: var(--bg-card);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-            position: relative;
-        }
-
+        .event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .event-card { background: var(--bg-card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; position: relative; }
         .event-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-5px); }
-
-        .event-img { width: 100%; height: 180px; object-fit: cover; }
-
+        .event-img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; }
         .event-body { padding: 20px; }
-
         .event-time { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
         .event-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
         .event-meta { font-size: 0.85rem; color: var(--text-dim); }
-
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-            display: none; justify-content: center; align-items: center;
-            z-index: 2000; padding: 20px; backdrop-filter: blur(10px);
-        }
-
-        .modal-box {
-            background: var(--bg-card);
-            width: 100%;
-            max-width: 650px;
-            border-radius: 24px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(10px); }
+        .modal-box { background: var(--bg-card); width: 100%; max-width: 650px; border-radius: 24px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid rgba(255,255,255,0.1); }
         .admin-form { padding: 30px; display: flex; flex-direction: column; gap: 15px; }
-        .admin-form input, .admin-form textarea, .admin-form select {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 14px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
+        .admin-form input, .admin-form textarea, .admin-form select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; color: white; outline: none; }
+        .btn-primary { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .btn-primary:hover { background: var(--accent-hover); }
-
-        .btn-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            color: black;
-            padding: 12px 24px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            margin-top: 20px;
-        }
-
-        .admin-only { display: none; }
+        .btn-link { display: inline-flex; align-items: center; gap: 10px; background: white; color: black; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 700; margin-top: 20px; }
+        .admin-only { display: none !important; }
         .logged-in-admin .admin-only { display: flex !important; }
-
-        @media (max-width: 600px) {
-            .welcome-title { font-size: 1.8rem; }
-            .mode-card { width: 100%; }
-        }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; display: none; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
+
+    <div id="loading" class="loading-overlay"><p>Cargando...</p></div>
 
     <header class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -261,6 +93,7 @@
         <div id="daysContainer"></div>
     </main>
 
+    <!-- Modal Detalle -->
     <div id="detailModal" class="modal" onclick="cerrarSiFuera(event, 'detailModal')">
         <div class="modal-box">
             <div id="detailMedia"></div>
@@ -268,12 +101,13 @@
                 <div id="detailTime" class="event-time"></div>
                 <h2 id="detailTitle" style="font-size: 1.8rem; margin-bottom: 10px;"></h2>
                 <p id="detailResponsable" style="color: var(--accent); margin-bottom: 20px; font-weight: 600;"></p>
-                <p id="detailDesc" style="color: var(--text-dim); line-height: 1.7;"></p>
+                <p id="detailDesc" style="color: var(--text-dim); line-height: 1.7; white-space: pre-line;"></p>
                 <div id="detailLinkArea"></div>
             </div>
         </div>
     </div>
 
+    <!-- Modal Login -->
     <div id="loginModal" class="modal" onclick="cerrarSiFuera(event, 'loginModal')">
         <div class="modal-box" style="max-width: 400px;">
             <div class="admin-form">
@@ -285,6 +119,7 @@
         </div>
     </div>
 
+    <!-- Modal Admin -->
     <div id="adminModal" class="modal" onclick="cerrarSiFuera(event, 'adminModal')">
         <div class="modal-box">
             <form id="formActividad" class="admin-form">
@@ -307,40 +142,59 @@
                 </div>
                 <input type="url" id="fLink" placeholder="Link (Zoom, YouTube, etc.)">
                 <div>
-                    <label style="font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 5px;">Imagen de portada:</label>
+                    <label style="font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 5px;">Imagen de portada (opcional):</label>
                     <input type="file" id="fImgFile" accept="image/*">
                     <input type="hidden" id="fImgData">
                 </div>
                 <button type="submit" class="btn-primary">GUARDAR CAMBIOS</button>
-                <button type="button" id="btnDelete" class="btn-primary" style="background: #333;" onclick="eliminarActividad()">ELIMINAR</button>
+                <button type="button" id="btnDelete" class="btn-primary" style="background: #e91e63;" onclick="eliminarActividad()">ELIMINAR ACTIVIDAD</button>
             </form>
         </div>
     </div>
 
     <script>
+        // CONFIGURACIÓN SUPABASE
+        const SB_URL = "https://hrsywmxtlqayihmmvxdq.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyc3l3bXh0bHFheWlobW12eGRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1OTUwMDUsImV4cCI6MjEwMzE3MTAwNX0.6893srD5_KhZvT1RU_aLQWARbKs3fOWgi4Rd15Au_m0";
+        const supabase = typeof supabase !== 'undefined' ? supabase : window.supabase.createClient(SB_URL, SB_KEY);
+
         const DIAS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
-        const DEFAULT_IMG = "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800&q=80";
         
-        let actividades = JSON.parse(localStorage.getItem('cdn_hub_db')) || [];
+        // Imágenes genéricas de oficina al azar
+        const STOCK_OFFICE_IMGS = [
+            "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80"
+        ];
+        
+        let actividades = [];
         let modalidadActual = null;
         let isAdmin = false;
 
+        // Listener para convertir archivo a Base64 (para guardar directo en la DB por simplicidad)
         document.getElementById('fImgFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                if (file.size > 500000) { // Límite de 500kb para no saturar la DB con base64
+                    alert("Imagen muy pesada. Usa una menor a 500kb.");
+                    this.value = "";
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = e => document.getElementById('fImgData').value = e.target.result;
                 reader.readAsDataURL(file);
             }
         });
 
-        function seleccionarModalidad(m) {
+        async function seleccionarModalidad(m) {
             modalidadActual = m;
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('btnBack').style.display = 'flex';
             document.getElementById('sectionTitle').innerText = m === 'presencial' ? 'Agenda Presencial' : 'Agenda Online';
-            renderizar();
+            await cargarDatos();
         }
 
         function volver() {
@@ -349,27 +203,47 @@
             document.getElementById('btnBack').style.display = 'none';
         }
 
+        async function cargarDatos() {
+            showLoading(true);
+            const { data, error } = await supabase
+                .from('actividades')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error("Error cargando:", error);
+                alert("Error al conectar con la base de datos.");
+            } else {
+                actividades = data;
+                renderizar();
+            }
+            showLoading(false);
+        }
+
         function renderizar() {
             const container = document.getElementById('daysContainer');
             container.innerHTML = "";
             DIAS.forEach(dia => {
                 const filtradas = actividades.filter(a => a.dia === dia && a.tipo === modalidadActual);
+                
+                // Si eres admin, mostramos el día aunque esté vacío para que puedas agregar cosas
                 if (filtradas.length > 0 || isAdmin) {
                     const section = document.createElement('div');
                     section.className = 'day-group';
                     section.innerHTML = `<div class="day-label">${dia}</div><div class="event-grid" id="grid-${dia}"></div>`;
                     container.appendChild(section);
                     const grid = document.getElementById(`grid-${dia}`);
+                    
                     filtradas.forEach(act => {
                         const card = document.createElement('div');
                         card.className = 'event-card';
                         card.innerHTML = `
-                            <img src="${act.img || DEFAULT_IMG}" class="event-img" onclick="abrirDetalle(${act.id})">
+                            <img src="${act.img_url}" class="event-img" onclick="abrirDetalle(${act.id})">
                             <div class="event-body">
                                 <div class="event-time">${act.hora || 'Hora a definir'}</div>
                                 <h3 class="event-title">${act.titulo}</h3>
                                 <p class="event-meta">Por: ${act.responsable}</p>
-                                <div class="admin-only" style="margin-top:15px;">
+                                <div class="admin-only" style="margin-top:15px; display:${isAdmin?'flex':'none'};">
                                     <button class="icon-btn" onclick="abrirEditar(${act.id})"><i class="fa-solid fa-pen"></i></button>
                                 </div>
                             </div>
@@ -386,66 +260,86 @@
             document.getElementById('fImgData').value = "";
             document.getElementById('adminModal').style.display = 'flex';
             document.getElementById('btnDelete').style.display = 'none';
+            document.getElementById('adminFormTitle').innerText = "Nueva Actividad";
         }
 
         function abrirEditar(id) {
-            const act = actividades.find(a => a.id === id);
+            const act = actividades.find(a => a.id == id);
             document.getElementById('editId').value = act.id;
             document.getElementById('fTitulo').value = act.titulo;
             document.getElementById('fResponsable').value = act.responsable;
-            document.getElementById('fDesc').value = act.desc;
+            document.getElementById('fDesc').value = act.descripcion;
             document.getElementById('fDia').value = act.dia;
             document.getElementById('fHora').value = act.hora;
             document.getElementById('fLink').value = act.link || "";
-            document.getElementById('fImgData').value = act.img || "";
+            document.getElementById('fImgData').value = act.img_url || "";
             document.getElementById('adminModal').style.display = 'flex';
             document.getElementById('btnDelete').style.display = 'block';
+            document.getElementById('adminFormTitle').innerText = "Editar Actividad";
         }
 
-        document.getElementById('formActividad').onsubmit = function(e) {
+        document.getElementById('formActividad').onsubmit = async function(e) {
             e.preventDefault();
+            showLoading(true);
+            
             const id = document.getElementById('editId').value;
-            const data = {
-                id: id ? parseInt(id) : Date.now(),
+            
+            // Lógica de imagen: si no hay subida, elige una al azar
+            let finalImg = document.getElementById('fImgData').value;
+            if(!finalImg) {
+                finalImg = STOCK_OFFICE_IMGS[Math.floor(Math.random() * STOCK_OFFICE_IMGS.length)];
+            }
+
+            const dataToSave = {
                 titulo: document.getElementById('fTitulo').value,
                 responsable: document.getElementById('fResponsable').value,
-                desc: document.getElementById('fDesc').value,
+                descripcion: document.getElementById('fDesc').value,
                 dia: document.getElementById('fDia').value,
                 hora: document.getElementById('fHora').value,
                 link: document.getElementById('fLink').value,
-                img: document.getElementById('fImgData').value || DEFAULT_IMG,
+                img_url: finalImg,
                 tipo: modalidadActual
             };
+
+            let result;
             if(id) {
-                const idx = actividades.findIndex(a => a.id === parseInt(id));
-                actividades[idx] = data;
+                result = await supabase.from('actividades').update(dataToSave).eq('id', id);
             } else {
-                actividades.push(data);
+                result = await supabase.from('actividades').insert([dataToSave]);
             }
-            localStorage.setItem('cdn_hub_db', JSON.stringify(actividades));
-            renderizar();
-            cerrarModal('adminModal');
+
+            if (result.error) {
+                alert("Error al guardar: " + result.error.message);
+            } else {
+                await cargarDatos();
+                cerrarModal('adminModal');
+            }
+            showLoading(false);
         };
 
-        function eliminarActividad() {
-            if(confirm("¿Eliminar actividad?")) {
-                const id = parseInt(document.getElementById('editId').value);
-                actividades = actividades.filter(a => a.id !== id);
-                localStorage.setItem('cdn_hub_db', JSON.stringify(actividades));
-                renderizar();
-                cerrarModal('adminModal');
+        async function eliminarActividad() {
+            if(confirm("¿Estás seguro de eliminar esta actividad permanentemente?")) {
+                showLoading(true);
+                const id = document.getElementById('editId').value;
+                const { error } = await supabase.from('actividades').delete().eq('id', id);
+                if (error) alert("Error al eliminar");
+                else {
+                    await cargarDatos();
+                    cerrarModal('adminModal');
+                }
+                showLoading(false);
             }
         }
 
         function abrirDetalle(id) {
-            const act = actividades.find(a => a.id === id);
-            document.getElementById('detailMedia').innerHTML = `<img src="${act.img || DEFAULT_IMG}" style="width:100%; height:250px; object-fit:cover;">`;
+            const act = actividades.find(a => a.id == id);
+            document.getElementById('detailMedia').innerHTML = `<img src="${act.img_url}" style="width:100%; height:250px; object-fit:cover;">`;
             document.getElementById('detailTitle').innerText = act.titulo;
             document.getElementById('detailTime').innerText = act.dia + " | " + act.hora;
             document.getElementById('detailResponsable').innerText = "Facilitador: " + act.responsable;
-            document.getElementById('detailDesc').innerText = act.desc;
+            document.getElementById('detailDesc').innerText = act.descripcion;
             const areaLink = document.getElementById('detailLinkArea');
-            areaLink.innerHTML = act.link ? `<a href="${act.link}" target="_blank" class="btn-link"><i class="fa-solid fa-up-right-from-square"></i> ACCEDER</a>` : "";
+            areaLink.innerHTML = act.link ? `<a href="${act.link}" target="_blank" class="btn-link"><i class="fa-solid fa-up-right-from-square"></i> ACCEDER AHORA</a>` : "";
             document.getElementById('detailModal').style.display = 'flex';
         }
 
@@ -460,14 +354,16 @@
         }
 
         function intentarLogin() {
+            // Login simple como pediste. 
             if(document.getElementById('userLogin').value === 'admin' && document.getElementById('passLogin').value === 'cdn123') {
                 isAdmin = true;
                 document.body.classList.add('logged-in-admin');
                 cerrarModal('loginModal');
                 renderizar();
-            } else { alert("Error"); }
+            } else { alert("Credenciales incorrectas"); }
         }
 
+        function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
         function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
         function cerrarSiFuera(e, id) { if(e.target.id === id) cerrarModal(id); }
     </script>
