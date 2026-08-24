@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* (Tus estilos se mantienen iguales, solo añado uno para loading) */
         :root {
             --bg-main: #0b0e14; --bg-card: #161b22; --accent: #7c4dff;
             --accent-hover: #9575cd; --text-main: #f0f6fc; --text-dim: #8b949e;
@@ -20,21 +19,26 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+        
         .header { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 5%; display: flex; align-items: center; justify-content: space-between; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
         .brand { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, var(--accent)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+        
         .nav-tools { display: flex; gap: 12px; }
         .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .icon-btn:hover { background: var(--accent); transform: translateY(-2px); }
+
         .welcome-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         .welcome-title { font-size: 2.5rem; margin-bottom: 40px; font-weight: 800; }
         .mode-grid { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
         .mode-card { background: var(--bg-card); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.4s; width: 280px; }
-        .mode-card:hover { border-color: var(--accent); transform: scale(1.05); }
+        .mode-card:hover { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
         .mode-icon { font-size: 3rem; color: var(--accent); margin-bottom: 20px; }
+
         .main-container { padding: 100px 5% 50px; }
         .day-group { margin-bottom: 60px; }
         .day-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
         .day-label::after { content: ""; height: 1px; flex: 1; background: rgba(255,255,255,0.1); }
+
         .event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
         .event-card { background: var(--bg-card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; position: relative; }
         .event-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-5px); }
@@ -43,21 +47,26 @@
         .event-time { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
         .event-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
         .event-meta { font-size: 0.85rem; color: var(--text-dim); }
+
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(10px); }
         .modal-box { background: var(--bg-card); width: 100%; max-width: 650px; border-radius: 24px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        
         .admin-form { padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .admin-form input, .admin-form textarea, .admin-form select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; color: white; outline: none; }
         .btn-primary { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .btn-primary:hover { background: var(--accent-hover); }
+        
         .btn-link { display: inline-flex; align-items: center; gap: 10px; background: white; color: black; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 700; margin-top: 20px; }
+        
         .admin-only { display: none !important; }
         .logged-in-admin .admin-only { display: flex !important; }
-        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; display: none; align-items: center; justify-content: center; }
+        
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; display: none; align-items: center; justify-content: center; color: white; font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div id="loading" class="loading-overlay"><p>Cargando...</p></div>
+    <div id="loading" class="loading-overlay"><p>Procesando...</p></div>
 
     <header class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -146,7 +155,7 @@
                     <input type="file" id="fImgFile" accept="image/*">
                     <input type="hidden" id="fImgData">
                 </div>
-                <button type="submit" class="btn-primary">GUARDAR CAMBIOS</button>
+                <button type="submit" class="btn-primary" id="btnSubmitForm">GUARDAR CAMBIOS</button>
                 <button type="button" id="btnDelete" class="btn-primary" style="background: #e91e63;" onclick="eliminarActividad()">ELIMINAR ACTIVIDAD</button>
             </form>
         </div>
@@ -156,11 +165,11 @@
         // CONFIGURACIÓN SUPABASE
         const SB_URL = "https://hrsywmxtlqayihmmvxdq.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyc3l3bXh0bHFheWlobW12eGRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1OTUwMDUsImV4cCI6MjEwMzE3MTAwNX0.6893srD5_KhZvT1RU_aLQWARbKs3fOWgi4Rd15Au_m0";
-        const supabase = typeof supabase !== 'undefined' ? supabase : window.supabase.createClient(SB_URL, SB_KEY);
+        
+        // Usamos 'sb' para evitar conflictos con la librería global
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
         const DIAS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
-        
-        // Imágenes genéricas de oficina al azar
         const STOCK_OFFICE_IMGS = [
             "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
             "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
@@ -173,14 +182,13 @@
         let modalidadActual = null;
         let isAdmin = false;
 
-        // Listener para convertir archivo a Base64 (para guardar directo en la DB por simplicidad)
+        // Procesar imagen
         document.getElementById('fImgFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                if (file.size > 500000) { // Límite de 500kb para no saturar la DB con base64
-                    alert("Imagen muy pesada. Usa una menor a 500kb.");
-                    this.value = "";
-                    return;
+                if (file.size > 800000) {
+                    alert("Imagen muy pesada. Usa una menor a 800kb.");
+                    this.value = ""; return;
                 }
                 const reader = new FileReader();
                 reader.onload = e => document.getElementById('fImgData').value = e.target.result;
@@ -205,14 +213,13 @@
 
         async function cargarDatos() {
             showLoading(true);
-            const { data, error } = await supabase
+            const { data, error } = await sb
                 .from('actividades')
                 .select('*')
                 .order('created_at', { ascending: false });
             
             if (error) {
-                console.error("Error cargando:", error);
-                alert("Error al conectar con la base de datos.");
+                console.error("Error cargando datos:", error.message);
             } else {
                 actividades = data;
                 renderizar();
@@ -225,8 +232,6 @@
             container.innerHTML = "";
             DIAS.forEach(dia => {
                 const filtradas = actividades.filter(a => a.dia === dia && a.tipo === modalidadActual);
-                
-                // Si eres admin, mostramos el día aunque esté vacío para que puedas agregar cosas
                 if (filtradas.length > 0 || isAdmin) {
                     const section = document.createElement('div');
                     section.className = 'day-group';
@@ -238,13 +243,13 @@
                         const card = document.createElement('div');
                         card.className = 'event-card';
                         card.innerHTML = `
-                            <img src="${act.img_url}" class="event-img" onclick="abrirDetalle(${act.id})">
+                            <img src="${act.img_url}" class="event-img" onclick="abrirDetalle('${act.id}')">
                             <div class="event-body">
                                 <div class="event-time">${act.hora || 'Hora a definir'}</div>
                                 <h3 class="event-title">${act.titulo}</h3>
                                 <p class="event-meta">Por: ${act.responsable}</p>
                                 <div class="admin-only" style="margin-top:15px; display:${isAdmin?'flex':'none'};">
-                                    <button class="icon-btn" onclick="abrirEditar(${act.id})"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="icon-btn" onclick="abrirEditar('${act.id}')"><i class="fa-solid fa-pen"></i></button>
                                 </div>
                             </div>
                         `;
@@ -281,10 +286,8 @@
         document.getElementById('formActividad').onsubmit = async function(e) {
             e.preventDefault();
             showLoading(true);
-            
             const id = document.getElementById('editId').value;
             
-            // Lógica de imagen: si no hay subida, elige una al azar
             let finalImg = document.getElementById('fImgData').value;
             if(!finalImg) {
                 finalImg = STOCK_OFFICE_IMGS[Math.floor(Math.random() * STOCK_OFFICE_IMGS.length)];
@@ -303,13 +306,13 @@
 
             let result;
             if(id) {
-                result = await supabase.from('actividades').update(dataToSave).eq('id', id);
+                result = await sb.from('actividades').update(dataToSave).eq('id', id);
             } else {
-                result = await supabase.from('actividades').insert([dataToSave]);
+                result = await sb.from('actividades').insert([dataToSave]);
             }
 
             if (result.error) {
-                alert("Error al guardar: " + result.error.message);
+                alert("Error: " + result.error.message);
             } else {
                 await cargarDatos();
                 cerrarModal('adminModal');
@@ -318,10 +321,10 @@
         };
 
         async function eliminarActividad() {
-            if(confirm("¿Estás seguro de eliminar esta actividad permanentemente?")) {
+            if(confirm("¿Eliminar actividad permanentemente?")) {
                 showLoading(true);
                 const id = document.getElementById('editId').value;
-                const { error } = await supabase.from('actividades').delete().eq('id', id);
+                const { error } = await sb.from('actividades').delete().eq('id', id);
                 if (error) alert("Error al eliminar");
                 else {
                     await cargarDatos();
@@ -333,6 +336,7 @@
 
         function abrirDetalle(id) {
             const act = actividades.find(a => a.id == id);
+            if(!act) return;
             document.getElementById('detailMedia').innerHTML = `<img src="${act.img_url}" style="width:100%; height:250px; object-fit:cover;">`;
             document.getElementById('detailTitle').innerText = act.titulo;
             document.getElementById('detailTime').innerText = act.dia + " | " + act.hora;
@@ -343,6 +347,15 @@
             document.getElementById('detailModal').style.display = 'flex';
         }
 
+        function intentarLogin() {
+            if(document.getElementById('userLogin').value === 'admin' && document.getElementById('passLogin').value === 'cdn123') {
+                isAdmin = true;
+                document.body.classList.add('logged-in-admin');
+                cerrarModal('loginModal');
+                renderizar();
+            } else { alert("Credenciales incorrectas"); }
+        }
+
         function abrirLogin() {
             if(isAdmin) {
                 isAdmin = false;
@@ -351,16 +364,6 @@
             } else {
                 document.getElementById('loginModal').style.display = 'flex';
             }
-        }
-
-        function intentarLogin() {
-            // Login simple como pediste. 
-            if(document.getElementById('userLogin').value === 'admin' && document.getElementById('passLogin').value === 'cdn123') {
-                isAdmin = true;
-                document.body.classList.add('logged-in-admin');
-                cerrarModal('loginModal');
-                renderizar();
-            } else { alert("Credenciales incorrectas"); }
         }
 
         function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
